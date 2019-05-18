@@ -25,9 +25,8 @@ class Grupos extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nombre'] 'required'],
+            [['nombre'], 'required'],
             [['nombre'], 'string', 'max' => 255],
-
         ];
     }
 

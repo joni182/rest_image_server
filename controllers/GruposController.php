@@ -7,6 +7,7 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 /**
  * GruposController implements the CRUD actions for Grupos model.
@@ -29,13 +30,23 @@ class GruposController extends ActiveController
         ];
     }
 
+    public function actions()
+    {
+        $actions = parent::actions();
+        unset($actions['view']);
+        unset($actions['create']);
+        return $actions;
+    }
+
+
     /**
      * Lists all Grupos models.
      * @return mixed
      */
     public function actionIndex()
     {
-        return Grupos::findAll();
+        return null;
+        Grupos::findAll();
     }
 
     /**
@@ -46,7 +57,7 @@ class GruposController extends ActiveController
      */
     public function actionView($id)
     {
-        return $this->findModel($id);
+        return $this->findByName($id);
     }
 
     /**
@@ -56,15 +67,15 @@ class GruposController extends ActiveController
      */
     public function actionCreate()
     {
+        return dd($uploads = UploadedFile::getInstancesByName('upfile'));
         $model = new Grupos();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->response->statusCode = 201;
+            return $model;
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        throw new \yii\web\HttpException(500, 'The requested Item could not be found.');
     }
 
     /**
@@ -111,6 +122,14 @@ class GruposController extends ActiveController
     protected function findModel($id)
     {
         if (($model = Grupos::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    protected function findByName($nombre)
+    {
+        if (($model = Grupos::findOne(['nombre' => $nombre])) !== null) {
             return $model;
         }
 
