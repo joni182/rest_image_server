@@ -4,7 +4,6 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Grupos;
 
 /**
  * GruposSearch represents the model behind the search form of `\app\models\Grupos`.
@@ -31,7 +30,7 @@ class GruposSearch extends Grupos
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with search query applied.
      *
      * @param array $params
      *
