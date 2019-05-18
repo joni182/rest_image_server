@@ -9,9 +9,9 @@ CREATE TABLE grupos
     id BIGSERIAL PRIMARY KEY
 );
 
-DROP TABLE IF EXISTS image CASCADE;
+DROP TABLE IF EXISTS images CASCADE;
 
-CREATE TABLE image
+CREATE TABLE images
 (
     id         BIGSERIAL    PRIMARY KEY,
     grupo_id   BIGINT       REFERENCES grupos(id)
