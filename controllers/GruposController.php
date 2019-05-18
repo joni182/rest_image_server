@@ -2,18 +2,18 @@
 
 namespace app\controllers;
 
-use Yii;
 use app\models\Grupos;
-use app\models\GruposSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\rest\ActiveController;
+use yii\web\NotFoundHttpException;
 
 /**
  * GruposController implements the CRUD actions for Grupos model.
  */
-class GruposController extends Controller
+class GruposController extends ActiveController
 {
+    public $modelClass = 'app\models\Grupos';
     /**
      * {@inheritdoc}
      */
@@ -35,26 +35,18 @@ class GruposController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new GruposSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        return Grupos::findAll();
     }
 
     /**
      * Displays a single Grupos model.
-     * @param integer $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        return $this->findModel($id);
     }
 
     /**
@@ -78,7 +70,7 @@ class GruposController extends Controller
     /**
      * Updates an existing Grupos model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -98,7 +90,7 @@ class GruposController extends Controller
     /**
      * Deletes an existing Grupos model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -112,7 +104,7 @@ class GruposController extends Controller
     /**
      * Finds the Grupos model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
+     * @param int $id
      * @return Grupos the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
