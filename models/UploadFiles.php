@@ -1,16 +1,18 @@
 <?php
+
 namespace app\models;
 
+use Yii;
 use yii\base\Model;
 use yii\web\UploadedFile;
 
-class UploadForm extends Model
+class UploadFiles extends Model
 {
     /**
      * @var UploadedFile[]
      */
     public $imageFiles;
-
+    public $nombres = [];
     public function rules()
     {
         return [
@@ -21,12 +23,15 @@ class UploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
-            foreach ($this->imageFiles as $file) {
-                $file->saveAs('uploads/' . $file->baseName . '.' . $file->extension);
+            foreach ($this->imageFiles as $key => $file) {
+                $nombreGenerado = str_replace('.', '', microtime(true) . '') . $key;
+
+                copy($file->tempName, Yii::getAlias('@app/uploads/') . $nombreGenerado . $file->extension);
+
+                $this->nombres[] = $nombreGenerado;
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

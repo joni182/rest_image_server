@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Grupos;
+use app\models\UploadFiles;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
@@ -24,7 +25,9 @@ class GruposController extends ActiveController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'create' => ['POST'],
+                    'update' => ['PUT'],
+                    'delete' => ['DELETE'],
                 ],
             ],
         ];
@@ -35,6 +38,7 @@ class GruposController extends ActiveController
         $actions = parent::actions();
         unset($actions['view']);
         unset($actions['create']);
+        unset($actions['update']);
         return $actions;
     }
 
@@ -67,7 +71,8 @@ class GruposController extends ActiveController
      */
     public function actionCreate()
     {
-        return dd($uploads = UploadedFile::getInstancesByName('upfile'));
+        dd(UploadedFile::getInstancesByName('upfile'));
+
         $model = new Grupos();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -87,15 +92,19 @@ class GruposController extends ActiveController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        // necesario para que $_FILES se carge cuando la request es PUT
+        Yii::$app->request->getBodyParams();
+        $uploadFiles = new UploadFiles();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+
+        $uploadFiles->imageFiles = UploadedFile::getInstancesByName('upfile');
+
+
+        $uploadFiles->upload();
+
+        return $uploadFiles->nombres;
+        $model = $this->findByName($id);
     }
 
     /**
