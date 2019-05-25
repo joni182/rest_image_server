@@ -11,6 +11,7 @@ class UploadFiles extends Model
     /**
      * @var UploadedFile[]
      */
+    public $grupo_id;
     public $imageFiles;
     public $nombres = [];
     public function rules()
@@ -24,11 +25,16 @@ class UploadFiles extends Model
     {
         if ($this->validate()) {
             foreach ($this->imageFiles as $key => $file) {
-                $nombreGenerado = str_replace('.', '', microtime(true) . '') . $key;
+                $grupo_id = $this->grupo_id;
+                $nombre = str_replace('.', '', microtime(true) . '') . $key;
+                $extension = $file->extension;
+                $uri = Yii::getAlias('@app/files/') . $nombre . '.' . $extension;
 
-                copy($file->tempName, Yii::getAlias('@app/uploads/') . $nombreGenerado . $file->extension);
-
-                $this->nombres[] = $nombreGenerado;
+                if (copy($file->tempName, $uri)) {
+                    $image = new Images(compact('grupo_id', 'nombre', 'extension', 'uri'));
+                    $image->save();
+                    $this->nombres[] = $nombre;
+                }
             }
             return true;
         }

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Grupos;
+use app\models\Images;
 use app\models\UploadFiles;
 use Yii;
 use yii\filters\VerbFilter;
@@ -39,6 +40,7 @@ class GruposController extends ActiveController
         unset($actions['view']);
         unset($actions['create']);
         unset($actions['update']);
+        unset($actions['delete']);
         return $actions;
     }
 
@@ -49,8 +51,7 @@ class GruposController extends ActiveController
      */
     public function actionIndex()
     {
-        return null;
-        Grupos::findAll();
+        return Grupos::findAll();
     }
 
     /**
@@ -61,7 +62,9 @@ class GruposController extends ActiveController
      */
     public function actionView($id)
     {
-        return $this->findByName($id);
+        $nombre = $id;
+        $images = Images::findAll(['grupo_id' => $this->findByName($nombre)->id]);
+        return $images;
     }
 
     /**
@@ -71,11 +74,10 @@ class GruposController extends ActiveController
      */
     public function actionCreate()
     {
-        dd(UploadedFile::getInstancesByName('upfile'));
+        $model = new Grupos(Yii::$app->request->post());
 
-        $model = new Grupos();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->save()) {
             Yii::$app->response->statusCode = 201;
             return $model;
         }
@@ -87,24 +89,24 @@ class GruposController extends ActiveController
      * Updates an existing Grupos model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id
+     * @param mixed $nombre
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
+        $nombre = $id;
         // necesario para que $_FILES se carge cuando la request es PUT
         Yii::$app->request->getBodyParams();
+
+        $model = $this->findByName($nombre);
+
         $uploadFiles = new UploadFiles();
-
-
-
+        $uploadFiles->grupo_id = $model->id;
         $uploadFiles->imageFiles = UploadedFile::getInstancesByName('upfile');
-
-
         $uploadFiles->upload();
 
         return $uploadFiles->nombres;
-        $model = $this->findByName($id);
     }
 
     /**
@@ -116,9 +118,16 @@ class GruposController extends ActiveController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $nombre = $id;
+        $model = $this->findByName($nombre);
 
-        return $this->redirect(['index']);
+        foreach ($model->images as $image) {
+            if (Yii::$app->fs->has($image->nombreConExtension())) {
+                Yii::$app->fs->delete($image->nombreConExtension());
+            }
+            $image->delete();
+        }
+        return $model->delete();
     }
 
     /**

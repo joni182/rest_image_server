@@ -63,4 +63,9 @@ class Images extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Grupos::className(), ['id' => 'grupo_id'])->inverseOf('images');
     }
+
+    public function nombreConExtension()
+    {
+        return $this->nombre . '.' . $this->extension;
+    }
 }

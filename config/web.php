@@ -14,6 +14,10 @@ $config = [
     ],
     'language' => 'es-ES',
     'components' => [
+        'fs' => [
+            'class' => 'creocoder\flysystem\LocalFilesystem',
+            'path' => '@app/files',
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'parsers' => [
