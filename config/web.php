@@ -14,6 +14,10 @@ $config = [
     ],
     'language' => 'es-ES',
     'components' => [
+        'phpNetHttp' => [
+           'class' => 'yii\httpclient\Client',
+           'baseUrl' => 'http://uk.php.net',
+        ],
         'fs' => [
             'class' => 'creocoder\flysystem\LocalFilesystem',
             'path' => '@app/files',
@@ -71,6 +75,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'grupos'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'images'],
             ],
         ],
     ],

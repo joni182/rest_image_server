@@ -9,6 +9,7 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 /**
@@ -62,9 +63,17 @@ class GruposController extends ActiveController
      */
     public function actionView($id)
     {
+        // $images = Images::find()->all();
+        // dd(file_get_contents($images[0]->uri));
+        // $response = \Yii::$app->response;
+        // $response->format = Response::FORMAT_RAW;
+        // $response->headers->add('content-type', 'image/jpg');
+        // $img_data = file_get_contents($images[0]->uri);
+        // $response->data = $img_data;
+        // return $response;
         $nombre = $id;
-        $images = Images::findAll(['grupo_id' => $this->findByName($nombre)->id]);
-        return $images;
+
+        return $this->prepareRespuesta($this->findByName($nombre)->images);
     }
 
     /**
@@ -152,5 +161,27 @@ class GruposController extends ActiveController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    protected function prepareRespuesta($models)
+    {
+        if (is_array($models)) {
+            $respuesta = [];
+            foreach ($models as $model) {
+                $contents = Yii::$app->fs->read($model->nombreConExtension());
+                $nombre = $model->nombre;
+                $respuesta['names'][] = $nombre;
+                $respuesta['contents'][$nombre] = base64_encode($contents);
+                $respuesta['extension'][$nombre] = $model->extension;
+            }
+        } else {
+            $contents = Yii::$app->fs->read($models->nombreConExtension());
+            $nombre = $models->nombre;
+            $respuesta = [];
+            $respuesta['names'][] = $nombre;
+            $respuesta['contents'][$nombre] = base64_encode($contents);
+            $respuesta['extension'][$nombre] = $model->extension;
+        }
+        return $respuesta;
     }
 }
