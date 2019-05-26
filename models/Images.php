@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "images".
  *
@@ -64,5 +62,10 @@ class Images extends \yii\db\ActiveRecord
     public function getGrupo()
     {
         return $this->hasOne(Grupos::className(), ['id' => 'grupo_id'])->inverseOf('images');
+    }
+
+    public function nombreConExtension()
+    {
+        return $this->nombre . '.' . $this->extension;
     }
 }

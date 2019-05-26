@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "grupos".
  *
@@ -26,7 +24,10 @@ class Grupos extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [];
+        return [
+            [['nombre'], 'required'],
+            [['nombre'], 'string', 'max' => 255],
+        ];
     }
 
     /**
