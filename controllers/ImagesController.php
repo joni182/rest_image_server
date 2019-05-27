@@ -3,11 +3,11 @@
 namespace app\controllers;
 
 use app\models\Images;
-use app\models\ImagesSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * ImagesController implements the CRUD actions for Images model.
@@ -27,6 +27,7 @@ class ImagesController extends ActiveController
                 'actions' => [
                     'delete' => ['POST'],
                     'view' => ['GET'],
+                    'index' => ['GET'],
                 ],
             ],
         ];
@@ -48,13 +49,12 @@ class ImagesController extends ActiveController
      */
     public function actionIndex()
     {
-        $searchModel = new ImagesSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        $images = Images::findAll();
+        $rutes = [];
+        foreach ($images as $image) {
+            $rutes[] = $image->nombre;
+        }
+        return $rutes;
     }
 
     /**
@@ -67,7 +67,12 @@ class ImagesController extends ActiveController
     {
         $nombre = $id;
         $model = $this->findByName($nombre);
-        return $this->prepareRespuesta($model);
+        $response = \Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        $response->headers->add('content-type', 'image/jpg');
+        $img_data = Yii::$app->fs->read($model->nombreConExtension());
+        $response->data = $img_data;
+        return $response;
     }
 
     /**
@@ -77,15 +82,16 @@ class ImagesController extends ActiveController
      */
     public function actionCreate()
     {
-        $model = new Images();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        // $model = new Images();
+        //
+        // if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        //     return $this->redirect(['view', 'id' => $model->id]);
+        // }
+        //
+        // return $this->render('create', [
+        //     'model' => $model,
+        // ]);
+        throw new \yii\web\HttpException(501, 'Error HTTP 501 Not implemented.');
     }
 
     /**
@@ -97,15 +103,20 @@ class ImagesController extends ActiveController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        // $nombre = $id;
+        // $model = $this->findByName($nombre);
+        // // necesario para que $_FILES se carge cuando la request es PUT
+        // Yii::$app->request->getBodyParams();
+        //
+        // $model = $this->findByName($nombre);
+        //
+        // $uploadFiles = new UploadFiles();
+        // $uploadFiles->grupo_id = $model->id;
+        // $uploadFiles->imageFiles = UploadedFile::getInstancesByName('upfile');
+        // $uploadFiles->upload();
+        //
+        // return $uploadFiles->nombres;
+        throw new \yii\web\HttpException(501, 'Error HTTP 501 Not implemented.');
     }
 
     /**
@@ -148,32 +159,5 @@ class ImagesController extends ActiveController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    protected function prepareRespuesta($models)
-    {
-        if (is_array($models)) {
-            foreach ($models as $model) {
-                $contents = Yii::$app->fs->read($model->nombreConExtension());
-                $nombre = $model->nombre;
-                $respuesta = [];
-                $respuesta['contents'][$nombre] = base64_encode($contents);
-                $respuesta['extension'][$nombre] = $model->extension;
-                return $respuesta;
-            }
-        } else {
-            $contents = Yii::$app->fs->read($models->nombreConExtension());
-            $nombre = $models->nombre;
-            $respuesta = [
-                'contents' => [
-                    $nombre => base64_encode($contents),
-                ],
-                'extension' => [
-                    $nombre => $models->extension,
-                ],
-            ];
-        }
-
-        return $respuesta;
     }
 }
