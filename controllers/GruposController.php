@@ -25,6 +25,7 @@ class GruposController extends ActiveController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
+                    'view' => ['GET'],
                     'create' => ['POST'],
                     'update' => ['PUT'],
                     'delete' => ['DELETE'],
@@ -78,10 +79,11 @@ class GruposController extends ActiveController
     public function actionCreate()
     {
         $model = new Grupos(Yii::$app->request->post());
-
-        if ($model->save()) {
-            Yii::$app->response->statusCode = 201;
-            return $model;
+        if (Grupos::findOne(['nombre' => $model->nombre]) === null) {
+            if ($model->save()) {
+                Yii::$app->response->statusCode = 201;
+                return $model;
+            }
         }
 
         throw new \yii\web\HttpException(500, 'The requested Item could not be found.');

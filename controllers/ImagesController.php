@@ -25,7 +25,7 @@ class ImagesController extends ActiveController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['DELETE'],
                     'view' => ['GET'],
                     'index' => ['GET'],
                 ],
@@ -36,6 +36,7 @@ class ImagesController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
+        unset($actions['index']);
         unset($actions['view']);
         unset($actions['create']);
         unset($actions['update']);
@@ -49,7 +50,7 @@ class ImagesController extends ActiveController
      */
     public function actionIndex()
     {
-        $images = Images::findAll();
+        $images = Images::find()->All();
         $rutes = [];
         foreach ($images as $image) {
             $rutes[] = $image->nombre;
@@ -82,15 +83,6 @@ class ImagesController extends ActiveController
      */
     public function actionCreate()
     {
-        // $model = new Images();
-        //
-        // if ($model->load(Yii::$app->request->post()) && $model->save()) {
-        //     return $this->redirect(['view', 'id' => $model->id]);
-        // }
-        //
-        // return $this->render('create', [
-        //     'model' => $model,
-        // ]);
         throw new \yii\web\HttpException(501, 'Error HTTP 501 Not implemented.');
     }
 
