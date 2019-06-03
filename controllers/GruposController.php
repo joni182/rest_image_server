@@ -3,13 +3,11 @@
 namespace app\controllers;
 
 use app\models\Grupos;
-use app\models\Images;
 use app\models\UploadFiles;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 use yii\web\UploadedFile;
 
 /**
@@ -27,6 +25,8 @@ class GruposController extends ActiveController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
+                    'index' => ['GET'],
+                    'view' => ['GET'],
                     'create' => ['POST'],
                     'update' => ['PUT'],
                     'delete' => ['DELETE'],
@@ -38,6 +38,7 @@ class GruposController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
+        unset($actions['index']);
         unset($actions['view']);
         unset($actions['create']);
         unset($actions['update']);
@@ -52,7 +53,7 @@ class GruposController extends ActiveController
      */
     public function actionIndex()
     {
-        return Grupos::findAll();
+        return Grupos::find()->all();
     }
 
     /**
@@ -63,17 +64,13 @@ class GruposController extends ActiveController
      */
     public function actionView($id)
     {
-        // $images = Images::find()->all();
-        // dd(file_get_contents($images[0]->uri));
-        // $response = \Yii::$app->response;
-        // $response->format = Response::FORMAT_RAW;
-        // $response->headers->add('content-type', 'image/jpg');
-        // $img_data = file_get_contents($images[0]->uri);
-        // $response->data = $img_data;
-        // return $response;
         $nombre = $id;
-
-        return $this->prepareRespuesta($this->findByName($nombre)->images);
+        $images = $this->findByName($nombre)->images;
+        $rutes = [];
+        foreach ($images as $image) {
+            $rutes[] = $image->nombre;
+        }
+        return $rutes;
     }
 
     /**
@@ -84,11 +81,11 @@ class GruposController extends ActiveController
     public function actionCreate()
     {
         $model = new Grupos(Yii::$app->request->post());
-
-
-        if ($model->save()) {
-            Yii::$app->response->statusCode = 201;
-            return $model;
+        if (Grupos::findOne(['nombre' => $model->nombre]) === null) {
+            if ($model->save()) {
+                Yii::$app->response->statusCode = 201;
+                return $model;
+            }
         }
 
         throw new \yii\web\HttpException(500, 'The requested Item could not be found.');
@@ -161,27 +158,5 @@ class GruposController extends ActiveController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    protected function prepareRespuesta($models)
-    {
-        if (is_array($models)) {
-            $respuesta = [];
-            foreach ($models as $model) {
-                $contents = Yii::$app->fs->read($model->nombreConExtension());
-                $nombre = $model->nombre;
-                $respuesta['names'][] = $nombre;
-                $respuesta['contents'][$nombre] = base64_encode($contents);
-                $respuesta['extension'][$nombre] = $model->extension;
-            }
-        } else {
-            $contents = Yii::$app->fs->read($models->nombreConExtension());
-            $nombre = $models->nombre;
-            $respuesta = [];
-            $respuesta['names'][] = $nombre;
-            $respuesta['contents'][$nombre] = base64_encode($contents);
-            $respuesta['extension'][$nombre] = $model->extension;
-        }
-        return $respuesta;
     }
 }
