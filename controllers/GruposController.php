@@ -25,6 +25,7 @@ class GruposController extends ActiveController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
+                    'index' => ['GET'],
                     'view' => ['GET'],
                     'create' => ['POST'],
                     'update' => ['PUT'],
@@ -37,6 +38,7 @@ class GruposController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
+        unset($actions['index']);
         unset($actions['view']);
         unset($actions['create']);
         unset($actions['update']);
@@ -51,7 +53,7 @@ class GruposController extends ActiveController
      */
     public function actionIndex()
     {
-        return Grupos::findAll();
+        return Grupos::find()->all();
     }
 
     /**
