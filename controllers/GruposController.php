@@ -65,7 +65,12 @@ class GruposController extends ActiveController
     public function actionView($id)
     {
         $nombre = $id;
-        $images = $this->findByName($nombre)->images;
+        try {
+            $images = $this->findByName($nombre)->images;
+        } catch (\Exception $e) {
+            return null;
+        }
+
         $rutes = [];
         foreach ($images as $image) {
             $rutes[] = $image->nombre;
