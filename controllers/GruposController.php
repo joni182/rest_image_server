@@ -73,7 +73,7 @@ class GruposController extends ActiveController
 
         $rutes = [];
         foreach ($images as $image) {
-            $rutes[] = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/images/' . $image->nombre;
+            $rutes[] = $_SERVER['HTTP_HOST'] .  '/images/' . $image->nombre;
         }
         return $rutes;
     }
