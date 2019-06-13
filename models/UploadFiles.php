@@ -17,7 +17,7 @@ class UploadFiles extends Model
     public function rules()
     {
         return [
-            [['imageFiles'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg', 'maxFiles' => 4],
+            [['imageFiles'], 'file', 'skipOnEmpty' => false, 'maxFiles' => 30, 'mimeTypes' => 'image/*'],
         ];
     }
 
@@ -27,7 +27,7 @@ class UploadFiles extends Model
             foreach ($this->imageFiles as $key => $file) {
                 $grupo_id = $this->grupo_id;
                 $nombre = str_replace('.', '', microtime(true) . '') . $key;
-                $extension = $file->extension;
+                $extension = str_replace('image/', '', $file->type);
                 $uri = Yii::getAlias('@app/files/') . $nombre . '.' . $extension;
 
                 if (copy($file->tempName, $uri)) {

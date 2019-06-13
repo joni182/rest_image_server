@@ -73,7 +73,7 @@ class GruposController extends ActiveController
 
         $rutes = [];
         foreach ($images as $image) {
-            $rutes[] = $image->nombre;
+            $rutes[] = $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/images/' . $image->nombre;
         }
         return $rutes;
     }
@@ -111,7 +111,6 @@ class GruposController extends ActiveController
         Yii::$app->request->getBodyParams();
 
         $model = $this->findByName($nombre);
-
         $uploadFiles = new UploadFiles();
         $uploadFiles->grupo_id = $model->id;
         $uploadFiles->imageFiles = UploadedFile::getInstancesByName('upfile');
